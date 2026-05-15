@@ -3,13 +3,17 @@ const dispatchWebOSPauseEvent = () => {
   document.dispatchEvent(evt);
 };
 
-const interceptBackgroundEvent = (evt: Event) => {
+const interceptForegroundLossEvent = (evt: Event) => {
   dispatchWebOSPauseEvent();
   evt.stopImmediatePropagation();
 };
 
-window.addEventListener('blur', interceptBackgroundEvent, true);
-document.addEventListener('visibilitychange', interceptBackgroundEvent, true);
+window.addEventListener('blur', interceptForegroundLossEvent, true);
+document.addEventListener(
+  'visibilitychange',
+  interceptForegroundLossEvent,
+  true
+);
 
 window.addEventListener(
   'focus',
@@ -19,30 +23,23 @@ window.addEventListener(
   true
 );
 
-Object.defineProperty(Document.prototype, 'visibilityState', {
-  configurable: true,
-  get() {
-    return 'visible';
-  }
-});
+const forceDocumentVisibilityProperty = (
+  property:
+    | 'visibilityState'
+    | 'hidden'
+    | 'webkitVisibilityState'
+    | 'webkitHidden',
+  value: DocumentVisibilityState | boolean
+) => {
+  Object.defineProperty(Document.prototype, property, {
+    configurable: true,
+    get() {
+      return value;
+    }
+  });
+};
 
-Object.defineProperty(Document.prototype, 'hidden', {
-  configurable: true,
-  get() {
-    return false;
-  }
-});
-
-Object.defineProperty(Document.prototype, 'webkitVisibilityState', {
-  configurable: true,
-  get() {
-    return 'visible';
-  }
-});
-
-Object.defineProperty(Document.prototype, 'webkitHidden', {
-  configurable: true,
-  get() {
-    return false;
-  }
-});
+forceDocumentVisibilityProperty('visibilityState', 'visible');
+forceDocumentVisibilityProperty('hidden', false);
+forceDocumentVisibilityProperty('webkitVisibilityState', 'visible');
+forceDocumentVisibilityProperty('webkitHidden', false);
