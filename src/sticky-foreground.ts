@@ -23,7 +23,7 @@ window.addEventListener(
   true
 );
 
-const forceDocumentVisibilityProperty = (
+const overrideVisibilityProperty = (
   property:
     | 'visibilityState'
     | 'hidden'
@@ -37,12 +37,12 @@ const forceDocumentVisibilityProperty = (
       return value;
     },
     set() {
-      // noop
+      // Keep forced visibility state immutable.
     }
   });
 };
 
-forceDocumentVisibilityProperty('visibilityState', 'visible');
-forceDocumentVisibilityProperty('hidden', false);
-forceDocumentVisibilityProperty('webkitVisibilityState', 'visible');
-forceDocumentVisibilityProperty('webkitHidden', false);
+overrideVisibilityProperty('visibilityState', 'visible');
+overrideVisibilityProperty('hidden', false);
+overrideVisibilityProperty('webkitVisibilityState', 'visible');
+overrideVisibilityProperty('webkitHidden', false);
