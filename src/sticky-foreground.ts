@@ -35,6 +35,9 @@ const forceDocumentVisibilityProperty = (
     configurable: true,
     get() {
       return value;
+    },
+    set() {
+      // noop
     }
   });
 };
