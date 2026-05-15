@@ -34,16 +34,6 @@ document.addEventListener(
   interceptBackgroundEvent,
   captureEventOptions
 );
-document.addEventListener(
-  'webOSAppPause',
-  interceptBackgroundEvent,
-  captureEventOptions
-);
-document.addEventListener(
-  'pause',
-  interceptBackgroundEvent,
-  captureEventOptions
-);
 
 window.addEventListener('focus', interceptForegroundEvent, captureEventOptions);
 window.addEventListener(
@@ -52,16 +42,6 @@ window.addEventListener(
   captureEventOptions
 );
 window.addEventListener(
-  'resume',
-  interceptForegroundEvent,
-  captureEventOptions
-);
-document.addEventListener(
-  'webOSAppResume',
-  interceptForegroundEvent,
-  captureEventOptions
-);
-document.addEventListener(
   'resume',
   interceptForegroundEvent,
   captureEventOptions
