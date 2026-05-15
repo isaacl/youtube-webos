@@ -1,26 +1,70 @@
-const dispatchWebOSPauseEvent = () => {
-  const evt = new Event('webOSPause');
-  document.dispatchEvent(evt);
+const captureEventOptions = { capture: true } as const;
+
+const pauseActiveVideo = () => {
+  const video = document.querySelector('video');
+  if (!(video instanceof HTMLVideoElement) || video.paused) return;
+  void video.pause();
 };
 
-const interceptForegroundLossEvent = (evt: Event) => {
-  dispatchWebOSPauseEvent();
+const isContainerLifecycleEvent = (evt: Event) =>
+  evt.target === window ||
+  evt.target === document ||
+  evt.target === document.body;
+
+const interceptBackgroundEvent = (evt: Event) => {
+  if (!isContainerLifecycleEvent(evt)) return;
+  pauseActiveVideo();
   evt.stopImmediatePropagation();
 };
 
-window.addEventListener('blur', interceptForegroundLossEvent, true);
+const interceptForegroundEvent = (evt: Event) => {
+  if (!isContainerLifecycleEvent(evt)) return;
+  evt.stopImmediatePropagation();
+};
+
+window.addEventListener('blur', interceptBackgroundEvent, captureEventOptions);
+window.addEventListener(
+  'webOSAppPause',
+  interceptBackgroundEvent,
+  captureEventOptions
+);
+window.addEventListener('pause', interceptBackgroundEvent, captureEventOptions);
 document.addEventListener(
   'visibilitychange',
-  interceptForegroundLossEvent,
-  true
+  interceptBackgroundEvent,
+  captureEventOptions
+);
+document.addEventListener(
+  'webOSAppPause',
+  interceptBackgroundEvent,
+  captureEventOptions
+);
+document.addEventListener(
+  'pause',
+  interceptBackgroundEvent,
+  captureEventOptions
 );
 
+window.addEventListener('focus', interceptForegroundEvent, captureEventOptions);
 window.addEventListener(
-  'focus',
-  (evt) => {
-    evt.stopImmediatePropagation();
-  },
-  true
+  'webOSAppResume',
+  interceptForegroundEvent,
+  captureEventOptions
+);
+window.addEventListener(
+  'resume',
+  interceptForegroundEvent,
+  captureEventOptions
+);
+document.addEventListener(
+  'webOSAppResume',
+  interceptForegroundEvent,
+  captureEventOptions
+);
+document.addEventListener(
+  'resume',
+  interceptForegroundEvent,
+  captureEventOptions
 );
 
 const overrideVisibilityProperty = (
